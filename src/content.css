@@ -1,0 +1,109 @@
+:is(
+  [data-testid*="message"],
+  [data-testid*="conversation-turn"],
+  [data-testid*="chat-message"],
+  [data-is-streaming],
+  .font-claude-message,
+  .font-user-message
+)[data-claude-rtl="true"],
+:is(
+  [data-testid*="message"],
+  [data-testid*="conversation-turn"],
+  [data-testid*="chat-message"],
+  [data-is-streaming],
+  .font-claude-message,
+  .font-user-message
+) :is(
+  p,
+  li,
+  blockquote,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .whitespace-pre-wrap,
+  .font-claude-message,
+  .font-user-message
+)[data-claude-rtl="true"],
+:is(
+  .ProseMirror[contenteditable="true"],
+  [data-testid*="chat-input"] [contenteditable="true"],
+  [data-testid*="composer"] [contenteditable="true"],
+  [contenteditable="true"][aria-label*="message" i],
+  [contenteditable="true"][aria-label*="prompt" i],
+  textarea[placeholder*="message" i],
+  textarea[placeholder*="prompt" i]
+)[data-claude-rtl="true"] {
+  text-align: start !important;
+  unicode-bidi: plaintext;
+}
+
+[data-claude-rtl="true"][dir="rtl"] {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+[data-claude-rtl="true"][dir="ltr"] {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[data-claude-rtl="true"][dir="auto"] {
+  text-align: start !important;
+}
+
+/* Technical content should remain predictable and copyable. */
+:is(
+  [data-testid*="message"],
+  [data-testid*="conversation-turn"],
+  [data-testid*="chat-message"],
+  [data-is-streaming],
+  .font-claude-message,
+  .font-user-message
+) :is(
+  pre,
+  code,
+  kbd,
+  samp,
+  table,
+  math,
+  svg,
+  [class*="katex"],
+  [class*="math"]
+),
+:is(
+  [data-testid*="message"],
+  [data-testid*="conversation-turn"],
+  [data-testid*="chat-message"],
+  [data-is-streaming],
+  .font-claude-message,
+  .font-user-message
+) :is(
+  pre,
+  code,
+  kbd,
+  samp,
+  table,
+  math,
+  svg,
+  [class*="katex"],
+  [class*="math"]
+) * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}
+
+[dir="rtl"] :is(ul, ol) {
+  padding-inline-start: 1.5rem;
+  padding-inline-end: 0;
+}
+
+[dir="rtl"] blockquote {
+  border-inline-start: 0;
+  border-inline-end: 0.25rem solid currentColor;
+  padding-inline-start: 0;
+  padding-inline-end: 1rem;
+}

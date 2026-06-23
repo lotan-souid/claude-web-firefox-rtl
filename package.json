@@ -1,0 +1,14 @@
+{
+  "name": "claude-web-firefox-rtl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Firefox extension that adds automatic RTL support to Claude.",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/direction.js && node --check src/content.js && node --check options/options.js",
+    "lint:addon": "npx web-ext lint",
+    "start": "npx web-ext run --source-dir . --url https://claude.ai/new",
+    "build": "npx web-ext build --overwrite-dest"
+  },
+  "license": "MIT"
+}
