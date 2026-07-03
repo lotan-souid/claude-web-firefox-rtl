@@ -33,6 +33,20 @@
     "textarea[placeholder*=\"prompt\" i]"
   ].join(", ");
 
+  const LTR_ISOLATE_SKIP_SELECTOR = [
+    "pre",
+    "code",
+    "kbd",
+    "samp",
+    "table",
+    "math",
+    "svg",
+    "[class*=\"katex\"]",
+    "[class*=\"math\"]",
+    "[data-claude-ltr-isolate=\"true\"]",
+    COMPOSER_SELECTOR
+  ].join(", ");
+
   let patchComposer = true;
   let observer;
 
@@ -42,6 +56,67 @@
     element.dataset.claudeRtl = "true";
   }
 
+  function shouldSkipTextNode(textNode) {
+    const parent = textNode.parentElement;
+    return !parent || parent.closest(LTR_ISOLATE_SKIP_SELECTOR);
+  }
+
+  function replaceTextNodeWithIsolates(textNode, runs) {
+    const fragment = document.createDocumentFragment();
+    const text = textNode.nodeValue;
+    let offset = 0;
+
+    for (const run of runs) {
+      if (run.start > offset) {
+        fragment.append(document.createTextNode(text.slice(offset, run.start)));
+      }
+
+      const isolate = document.createElement("bdi");
+      isolate.dir = "ltr";
+      isolate.dataset.claudeLtrIsolate = "true";
+      isolate.textContent = run.value;
+      fragment.append(isolate);
+      offset = run.end;
+    }
+
+    if (offset < text.length) {
+      fragment.append(document.createTextNode(text.slice(offset)));
+    }
+
+    textNode.replaceWith(fragment);
+  }
+
+  function isolateInlineLtrRuns(element) {
+    if (
+      element.getAttribute("dir") !== "rtl" ||
+      !element.matches(NATURAL_BLOCK_SELECTOR)
+    ) {
+      return;
+    }
+
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+      acceptNode(textNode) {
+        if (!/[A-Za-z0-9]/.test(textNode.nodeValue) || shouldSkipTextNode(textNode)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const replacements = [];
+
+    for (let textNode = walker.nextNode(); textNode; textNode = walker.nextNode()) {
+      const runs = directionApi.findLtrRuns(textNode.nodeValue);
+      if (runs.length > 0) {
+        replacements.push([textNode, runs]);
+      }
+    }
+
+    replacements.forEach(([textNode, runs]) => {
+      replaceTextNodeWithIsolates(textNode, runs);
+    });
+  }
+
   function applyToRoot(root) {
     if (!(root instanceof Element || root instanceof Document)) {
       return;
@@ -49,9 +124,13 @@
 
     if (root instanceof Element && root.matches(NATURAL_TEXT_SELECTOR)) {
       applyDirection(root);
+      isolateInlineLtrRuns(root);
     }
 
-    root.querySelectorAll(NATURAL_TEXT_SELECTOR).forEach(applyDirection);
+    root.querySelectorAll(NATURAL_TEXT_SELECTOR).forEach((element) => {
+      applyDirection(element);
+      isolateInlineLtrRuns(element);
+    });
 
     if (!patchComposer) {
       return;

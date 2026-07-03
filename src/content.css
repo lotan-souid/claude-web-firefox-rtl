@@ -37,7 +37,7 @@
   textarea[placeholder*="prompt" i]
 )[data-claude-rtl="true"] {
   text-align: start !important;
-  unicode-bidi: plaintext;
+  unicode-bidi: isolate;
 }
 
 [data-claude-rtl="true"][dir="rtl"] {
@@ -52,6 +52,11 @@
 
 [data-claude-rtl="true"][dir="auto"] {
   text-align: start !important;
+}
+
+[data-claude-ltr-isolate="true"] {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* Technical content should remain predictable and copyable. */
